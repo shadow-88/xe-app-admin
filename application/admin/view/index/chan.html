@@ -1,0 +1,706 @@
+{extend name='index/index'/} {block name='content'}
+<style type="text/css">
+	.layui-tab-content {
+		padding: 2vw;
+	}
+	
+	table {
+		width: 100% !important;
+	}
+	
+	form {
+		margin: 5vw;
+	}
+	fieldset{
+		position: relative;
+	}
+	.layui-table-cell {
+		height: inherit;
+		width: 92vw !important;
+		padding: 0;
+		margin: auto;
+	}
+	
+	.layui-row {
+		white-space: normal;
+		word-break: break-all;
+		line-height: 1rem;
+		font-size: 0.8rem;
+	}
+	
+	.layui-row .layui-row div {
+		padding: 0 2vw;
+	}
+	
+	.layui-table img {
+		width: 100%;
+		max-width: 100%;
+	}
+	
+	.layui-form-label {
+		padding: 9px 0;
+		width: 100%;
+	}
+	
+	.layui-input-block>.layui-col-xs12 {
+		border: 1px solid #e6e6e6;
+	}
+	
+	.layui-input-block>.layui-col-xs12>div {
+		padding: 1vw;
+		position: relative;
+	}
+	
+	.layui-input-block>.layui-col-xs12>div button {
+		width: 100%;
+	}
+	
+	.layui-input-block img {
+		width: 100%;
+	}
+	.my-del{
+		padding: 0;
+	    width: 22px;
+	    height: 22px;
+	    color: #000;
+	    background: #FFF;
+	    line-height: 11px;
+	    -moz-border-radius: 11px;
+	    -webkit-border-radius: 11px;
+	    border-radius: 11px;
+	    -moz-box-shadow: 1px 1px 1px #888888;
+	    box-shadow: 0px 0px 1px #888888;
+	    position: absolute;
+	    right: -11px;
+    	top: 2px;
+	}
+	.img-del{
+		padding: 0;
+	    width: 22px !important;
+	    height: 22px;
+	    color: #000;
+	    background: #FFF;
+	    line-height: 11px;
+	    -moz-border-radius: 11px;
+	    -webkit-border-radius: 11px;
+	    border-radius: 11px;
+	    -moz-box-shadow: 1px 1px 1px #888888;
+	    box-shadow: 0px 0px 1px #888888;
+	    position: absolute;
+	    right: -6px;
+    	top: -4px;
+	}
+	.my-del,.img-del .layui-icon{
+		margin: 0;
+	}
+	.my-del .layui-icon:hover,.img-del .layui-icon:hover{
+		color: red;
+	}
+	.layui-layer-btn{
+		text-align: center;
+	}
+</style>
+<script id="show" type="text/html">
+	<div class="layui-row">
+		<div class="layui-col-xs2 layui-col-sm2 layui-col-md1" style="padding-right: 1vw;">
+			<img src="__ROOT__/uploads/{{ JSON.parse(d.data).img }}">
+		</div>
+		<div class="layui-row layui-col-xs10 layui-col-sm10 layui-col-md11">
+			<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+				产品名:{{ JSON.parse(d.data).name }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				权重:{{ d.weight }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				整站权重:{{ d.allweight?d.allweight:"0" }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				显示:{{ (d.type==1)?"显示":"隐藏" }}
+			</div>
+			{{# layui.each(JSON.parse(d.data).type, function(k, arr){ }}
+			<div class="layui-col-xs12 layui-col-sm12 layui-col-md12" style="padding: 1vw;">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12" style="padding:1vw 0;-moz-box-shadow: 1px 1px 5px #888888; box-shadow: 1px 1px 5px #888888;">
+					<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+						规格名:{{ arr.type }}
+					</div>
+					<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+						规格类型:{{ arr.distype==0?"隐藏":arr.distype==1?"一般":arr.distype==2?"价格":arr.distype==3?"库存":"积分" }}
+					</div>
+					<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+						价格(折扣):{{ arr.price }}{{ arr.discount?"&ensp;("+arr.discount+")":"" }}
+					</div>
+					<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+						数量(折扣):{{ arr.nub }}{{ arr.disnub?"&ensp;("+arr.disnub+")":"" }}
+					</div>
+					<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+						积分:{{ arr.score?arr.score:"0" }}
+					</div>
+					<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+						权重:{{ arr.kindweight?arr.kindweight:"0" }}
+					</div>
+				</div>
+			</div>
+			{{# }); }}
+		</div>
+	</div>
+</script>
+<div class="layui-row">
+	<div class="layui-col-xs2 layui-col-sm2 layui-col-md1">
+		<label class="layui-form-label">关键词:</label>
+	</div>
+	<div class="layui-col-xs4 layui-col-sm2 layui-col-md2">
+		<input class="layui-input" autocomplete="off">
+	</div>
+	<div class="layui-col-xs2 layui-col-sm2 layui-col-md1">
+		<button class="layui-btn" data-type="reload">搜索</button>
+	</div>
+	<div class="layui-col-xs2 layui-col-sm2 layui-col-md1 layui-col-xs-offset2 layui-col-sm-offset2 layui-col-md-offset7">
+		<button class="layui-btn" data-type="new">新增</button>
+	</div>
+</div>
+<table id="list" lay-filter="edit"></table>
+<!--<form class="layui-form layui-form-pane" action="">
+	<input type="hidden" name="id">
+	<input type="hidden" name="img">
+	<input type="hidden" name="banner">
+	<div class="layui-form-item">
+		<label class="layui-form-label">产品名</label>
+		<div class="layui-input-block">
+			<input type="text" name="name" autocomplete="off" placeholder="请输入名称" lay-verify="required" class="layui-input">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">图片上传</label>
+		<div class="layui-input-block">
+			<div class="layui-col-xs12">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					<button class="layui-btn" id="upimg" onclick="return false;">上传图片</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">图片上传</label>
+		<div class="layui-input-block">
+			<div class="layui-col-xs12">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					<button class="layui-btn" id="upbanner" onclick="return false;">上传banner</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<fieldset class="layui-elem-field">
+		<button class="layui-btn my-del" data-type="delkind" onclick="return false;">
+			<i class="layui-icon">&#x1006;</i>
+		</button>
+		<legend>规格</legend>
+		<div class="layui-field-box">
+			<div class="layui-form-item">
+				<label class="layui-form-label">规格名</label>
+				<div class="layui-input-block">
+					<input type="text" name="type" autocomplete="off" placeholder="请输入名称" lay-verify="required" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">价格</label>
+				<div class="layui-input-block">
+					<input type="number" name="price" autocomplete="off" placeholder="请输入数字" lay-verify="required" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">数量</label>
+				<div class="layui-input-block">
+					<input type="number" name="nub" autocomplete="off" placeholder="请输入数字" lay-verify="required" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">规格类型</label>
+				<div class="layui-input-block">
+					<input type="checkbox" name="distype" value="0" title="隐藏" lay-filter="distype">
+					<input type="checkbox" name="distype" value="1" title="一般" lay-filter="distype" checked>
+					<input type="checkbox" name="distype" value="2" title="价格" lay-filter="distype">
+					<input type="checkbox" name="distype" value="3" title="库存" lay-filter="distype">
+					<input type="checkbox" name="distype" value="4" title="积分" lay-filter="distype">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">折扣价格</label>
+				<div class="layui-input-block">
+					<input type="number" name="discount" autocomplete="off" placeholder="请输入数字" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">折扣数量</label>
+				<div class="layui-input-block">
+					<input type="number" name="disnub" autocomplete="off" placeholder="请输入数字" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">所需积分</label>
+				<div class="layui-input-block">
+					<input type="number" name="score" autocomplete="off" placeholder="请输入数字" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">规格权重</label>
+				<div class="layui-input-block">
+					<input type="number" name="kindweight" autocomplete="off" placeholder="请输入数字" class="layui-input">
+				</div>
+			</div>
+		</div>
+	</fieldset>
+	<div class="layui-form-item">
+		<div class="layui-input-block">
+			<button class="layui-btn layui-btn-small" lay-submit="" lay-filter="updata" onclick="return false;">提交</button>
+			<button class="layui-btn layui-btn-small" data-type="addkind" onclick="return false;">添加规格</button>
+			<button class="layui-btn layui-btn-small" data-type="cancel" onclick="return false;">取消</button>
+		</div>
+	</div>
+</form>-->
+<fieldset class="layui-elem-field layui-field-title">
+</fieldset>
+<script src="__STATIC__/underscore-min.js"></script>
+<script>
+	layui.use(['form', 'table', 'element', 'upload'], function() {
+		var form = layui.form,
+			table = layui.table,
+			$ = layui.$,
+			upload = layui.upload,
+			//所用到的表单和type范围预定义
+			model="chan",scope=1,
+			//预定义弹出层名字
+			lay_form,
+			active = {
+				//header
+				header: function() {
+					return '<form class="layui-form layui-form-pane"action=""><input type="hidden"name="id"><input type="hidden"name="img"><input type="hidden"name="banner"><div class="layui-form-item"><label class="layui-form-label">产品名</label><div class="layui-input-block"><input type="text"name="name"autocomplete="off"placeholder="请输入名称"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">图片上传</label><div class="layui-input-block"><div class="layui-col-xs12"><div class="layui-col-xs12 layui-col-sm12 layui-col-md12"><button class="layui-btn"id="upimg"onclick="return false;">上传图片</button></div></div></div></div><div class="layui-form-item"><label class="layui-form-label">图片上传</label><div class="layui-input-block"><div class="layui-col-xs12"><div class="layui-col-xs12 layui-col-sm12 layui-col-md12"><button class="layui-btn"id="upbanner"onclick="return false;">上传banner</button></div></div></div></div>';
+				},
+				content: function(){
+					return '<fieldset class="layui-elem-field"><button class="layui-btn my-del"data-type="delkind"onclick="return false;"><i class="layui-icon">&#x1006;</i></button><legend>规格</legend><div class="layui-field-box"><div class="layui-form-item"><label class="layui-form-label">规格名</label><div class="layui-input-block"><input type="text"name="type"autocomplete="off"placeholder="请输入名称"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">价格</label><div class="layui-input-block"><input type="number"name="price"autocomplete="off"placeholder="请输入数字"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">数量</label><div class="layui-input-block"><input type="number"name="nub"autocomplete="off"placeholder="请输入数字"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">规格类型</label><div class="layui-input-block"><input type="checkbox"name="distype"value="0"title="隐藏"lay-filter="distype"><input type="checkbox"name="distype"value="1"title="一般"lay-filter="distype"checked><input type="checkbox"name="distype"value="2"title="价格"lay-filter="distype"><input type="checkbox"name="distype"value="3"title="库存"lay-filter="distype"><input type="checkbox"name="distype"value="4"title="积分"lay-filter="distype"></div></div><div class="layui-form-item"><label class="layui-form-label">折扣价格</label><div class="layui-input-block"><input type="number"name="discount"autocomplete="off"placeholder="请输入数字"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">折扣数量</label><div class="layui-input-block"><input type="number"name="disnub"autocomplete="off"placeholder="请输入数字"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">所需积分</label><div class="layui-input-block"><input type="number"name="score"autocomplete="off"placeholder="请输入数字"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">规格权重</label><div class="layui-input-block"><input type="number"name="kindweight"autocomplete="off"placeholder="请输入数字"class="layui-input"></div></div></div></fieldset>';
+				},
+				footer: function(){
+					return '<div class="layui-form-item"><div class="layui-input-block"><button class="layui-btn layui-btn-small"lay-submit=""lay-filter="updata"onclick="return false;">提交</button><button class="layui-btn layui-btn-small"data-type="addkind"onclick="return false;">添加规格</button><button class="layui-btn layui-btn-small"data-type="cancel"onclick="return false;">取消</button></div></div></form>';
+				},
+				//新增
+				new: function() {
+					lay_form = layer.open({
+						type: 1,
+						title: false,
+						closeBtn: 0,
+						content: active['header'].call(this)+active['content'].call(this)+active['footer'].call(this),
+						scrollbar: false
+					});
+					layer.full(lay_form);
+					//监控upimg动作
+					active['upimg'].call(this);
+					//监控upbanner动作
+					active['upbanner'].call(this);
+					//上传触发
+					active['updata'].call(this);
+					//更新表单渲染
+					form.render();
+				},
+				//修改
+				edit: function(obj) {
+					lay_form = layer.open({
+						type: 1,
+						title: false,
+						closeBtn: 0,
+						content: active['header'].call(this)+active['footer'].call(this),
+						scrollbar: false
+					});
+					//表单数据显示
+					$("input[name='id']").val(obj.data.id);
+					$("input[name='name']").val(JSON.parse(obj.data.data).name);
+					$("input[name='img']").val(JSON.parse(obj.data.data).img);
+					$("input[name='banner']").val(JSON.stringify(JSON.parse(obj.data.data).banner));
+					layui.each(JSON.parse(obj.data.data).type, function(k, arr) {
+						var content=$(active['content'].call(this));
+						//checkbox单独列出
+						var check = content.find("input[name='distype']").parent().parent().find("input[value='"+arr.distype+"']");
+						check.siblings("input").removeAttr("checked");
+						check.attr("checked",true);
+						//其他内容
+						content.find("input[name='type']").val(arr.type);
+						content.find("input[name='price']").val(arr.price);
+						content.find("input[name='nub']").val(arr.nub);
+						content.find("input[name='discount']").val(arr.discount);
+						content.find("input[name='disnub']").val(arr.disnub);
+						content.find("input[name='weight']").val(arr.weight);
+						$("form>div").last().before(content);
+					});
+					//视图更新
+					$('#upimg').parent().before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delimg" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+JSON.parse(obj.data.data).img+'"></div>');
+					layui.each(JSON.parse(obj.data.data).banner, function(k, url) {
+						$('#upbanner').parent().before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delbanner" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+url+'"></div>');
+					});
+					//全屏
+					layer.full(lay_form);
+					//监控upimg动作
+					active['upimg'].call(this);
+					//监控upbanner动作
+					active['upbanner'].call(this);
+					//上传触发
+					active['updata'].call(this);
+					//更新表单渲染
+					form.render();
+				},
+				//搜索
+				reload: function() {
+					table.reload('list', {
+						where: {
+							key: $(this).parent().prev().children().val()
+						}
+					});
+				},
+				//改变权重
+				changeweight: function(obj,dom) {
+					//权重所在的位置可能不一样，尽量放在第二个位置
+					var thisdom=dom.eq(1);
+					layer.prompt({
+						formType: 0,
+						title: '修改 [ ' + JSON.parse(obj.data.data).name + ' ] 的权重'
+					}, function(value, index) {
+						value = parseInt(value) ? parseInt(value) : 0;
+						$.ajax({
+							url: "changeweight",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: model,
+								id: obj.data.id,
+								weight: value
+							},
+							success: function(data) {
+								thisdom.html('权重:'+value)
+								layer.msg("修改成功！");
+								return layer.close(index);
+							},
+							error: function() {
+								layer.msg("修改失败，请重试！");
+								return layer.close(index);
+							}
+						});
+	
+					});
+				},
+				//改变整站权重
+				changeallweight: function(obj,dom) {
+					//整站权重所在的位置可能不一样，尽量放在第三个位置
+					var thisdom=dom.eq(2);
+					layer.prompt({
+						formType: 0,
+						title: '修改 [ ' + JSON.parse(obj.data.data).name + ' ] 的整站权重'
+					}, function(value, index) {
+						value = parseInt(value) ? parseInt(value) : 0;
+						$.ajax({
+							url: "changeallweight",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: model,
+								id: obj.data.id,
+								weight: value
+							},
+							success: function(data) {
+								thisdom.html('整站权重:'+value)
+								layer.msg("修改成功！");
+								return layer.close(index);
+							},
+							error: function() {
+								layer.msg("修改失败，请重试！");
+								return layer.close(index);
+							}
+						});
+	
+					});
+				},
+				//改变显示方式
+				changetype: function(obj) {
+					//显示方式所在的位置可能不一样，尽量放在第三个位置*此处是第四个位置
+					var dom=$(this).find('.layui-col-xs10 div');
+					var typedom=dom.eq(3);
+					layer.msg('请选择 [ ' + JSON.parse(obj.data.data).name + ' ] 的处理方式！', {
+						time: 200000, //20s后自动关闭
+						btn: ['显示', '隐藏', '删除', '权重', '整站权重','其他修改',  '取消'],
+						yes: function(index, layero) {
+							$.ajax({
+								url: "changetype",
+								type: 'post',
+								dataType: 'json',
+								data: {
+									table: model,
+									id: obj.data.id,
+									type: scope
+								},
+								success: function(data) {
+									typedom.html('显示:显示');
+									return layer.close(index);
+								},
+								error: function() {
+									return layer.msg("修改失败，请重试！");
+								}
+							});
+						},
+						btn2: function(index, layero) {
+							$.ajax({
+								url: "changetype",
+								type: 'post',
+								dataType: 'json',
+								data: {
+									table: model,
+									id: obj.data.id,
+									type: scope+1
+								},
+								success: function(data) {
+									typedom.html('显示:隐藏');
+								},
+								error: function() {
+									return layer.msg("修改失败，请重试！");
+								}
+							});
+						},
+						btn3: function(index, layero) {
+							layer.msg('是否删除？', {
+								time: 20000, //20s后自动关闭
+								btn: ['确认', '取消'],
+								yes: function(index, layero) {
+									$.ajax({
+										url: "changetype",
+										type: 'post',
+										dataType: 'json',
+										data: {
+											table: model,
+											id: obj.data.id,
+											type: scope+2
+										},
+										success: function(data) {
+											obj.del();
+											return layer.close(index);
+										},
+										error: function() {
+											return layer.msg("修改失败，请重试！");
+										}
+									});
+								}
+							});
+						},
+						btn4: function(index, layero) {
+							active['changeweight'] ? active['changeweight'].call(this,obj,dom) : layer.msg("changeweight fail");
+						},
+						btn5: function(index, layero) {
+							active['changeallweight'] ? active['changeallweight'].call(this,obj,dom) : layer.msg("changeallweight fail");
+						},
+						btn6: function(index, layero) {
+							active['edit'] ? active['edit'].call(this,obj) : layer.msg("edit fail");
+						}
+					});
+				},
+				//上传
+				updata: function() {
+					form.on('submit(updata)', function(data) {
+						//id的值，data.field.id
+						//data的值
+						var out = new Object();
+						//name的值
+						out.name = data.field.name;
+						//img的值
+						out.img = data.field.img;
+						//banner的值
+						out.banner = data.field.banner?JSON.parse(data.field.banner):"";//多图片获取值
+						//水印的值
+						out.state = data.field.state;
+						//type的值
+						var res = active['getobj'] ? active['getobj'].call(this, '.layui-form') : null;
+						out.type = res;
+						//最终输出
+						if(out.img==""||out.banner==""){
+							layer.msg("请选择图片！");
+						}else{
+							$.ajax({
+								url: "updata",
+								type: 'post',
+								dataType: 'json',
+								data: {
+									table: model,
+									id: data.field.id,
+									s_id:2,//需要修改
+									data:JSON.stringify(out)
+								},
+								success: function(data) {
+									layer.close(lay_form);
+									//更新表单渲染
+									table.reload('list');
+									return layer.msg("提交成功！");
+								},
+								error: function() {
+									return layer.msg("提交失败，请重试！");
+								}
+							});
+						}
+					});
+				},
+				//获取表单信息，key为fieldset上一级的关键词
+				getobj: function(key) {
+					var res = new Array();
+					layui.each($(key).children("fieldset"), function(k, nodes) {
+						var arr = new Array(),middleware = new Array();
+						layui.each($(nodes).serializeArray(), function(v, data) {
+							arr[v] = _.chain(data)
+								.values()
+								.value();
+							middleware[v]=arr[v][0];
+						});
+						res[k] = {};
+						layui.each(_.union(middleware), function(v, name) {
+							layui.each(arr, function(i, children) {
+								if(children[0]==name){
+									if(res[k][name]==undefined){
+										res[k][name]=children[1];
+									}else{
+										res[k][name]+=','+children[1];
+									}
+								}
+							});
+						});
+					});
+					return res;
+				},
+				//图片上传img
+				upimg: function() {
+					upload.render({
+						elem: '#upimg',
+						url: 'upload',
+						before: function(obj) {
+							layer.load(2);
+						},
+						done: function(res, k, upload) {
+							layer.closeAll('loading');
+							//如果上传失败
+							if(res.code > 0) {
+								return layer.msg("上传失败！" + res.err);
+							} else {
+							//→→→→important→→→→→确认需赋值节点名称
+								var dom = $("input[name='img']");
+							//隐藏input的更新img
+								dom.val(res.url);
+							//视图更新
+								var parent=this.item.parent();
+								//单图片，所以需要在更新视图前删除前一个节点
+								if(parent.prev().length){
+									parent.prev().remove();
+								}
+								parent.before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delimg" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+res.url+'"></div>');
+							//弹出层提示
+								return layer.msg(res.msg);
+							}
+						}
+					});
+				},
+				//图片上传banner
+				upbanner: function() {
+					upload.render({
+						elem: '#upbanner',
+						url: 'upload',
+						before: function(obj) {
+							layer.load(2);
+						},
+						done: function(res, k, upload) {
+							layer.closeAll('loading');
+							//如果上传失败
+							if(res.code > 0) {
+								return layer.msg("上传失败！" + res.err);
+							} else {
+							//→→→→important→→→→→确认需赋值节点名称
+								var dom = $("input[name='banner']");
+							//隐藏input的更新img
+								var arr = new Array();
+								if(dom.val()){
+									arr=JSON.parse(dom.val());
+								}
+								arr.push(res.url)
+								dom.val(JSON.stringify(arr));
+							//视图更新
+								var parent=this.item.parent();
+								parent.before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delbanner" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+res.url+'"></div>');
+							//弹出层提示
+								return layer.msg(res.msg);
+							}
+						}
+					});
+				},
+				addkind: function() {
+					$(this).parent().parent().siblings('fieldset').last().after(active['content'].call(this));
+					//更新表单渲染
+					form.render();
+				},
+				delkind: function() {
+					if($(this).parent().siblings('fieldset').length){
+						$(this).parent().remove();
+					}
+				},
+				delimg: function() {
+					//input隐藏域更新
+					var dom = $("input[name='img']");
+					dom.val("");
+					//视图更新
+					$(this).parent().remove();
+					return layer.msg("图片已删除");
+				},
+				delbanner: function() {
+					//input隐藏域更新
+					var dom = $("input[name='banner']");
+					var arr = new Array();
+					arr=JSON.parse(dom.val());
+					arr.splice($(this).parent().index(),1);
+					dom.val(JSON.stringify(arr));
+					//视图更新
+					$(this).parent().remove();
+					return layer.msg("图片已删除");
+				},
+				//取消
+				cancel: function(){
+					layer.close(lay_form);
+				}
+			};
+		//表格
+		table.render({
+			elem: '#list',
+			url: model+'list?type='+scope+','+(scope+1),
+			height: 'auto',
+			cols: [
+				[{
+					title: '数据列表，需要修改请直接点击对应行',
+					templet: '#show',
+					event: 'set',
+					style: 'cursor: pointer;'
+				}]
+			],
+			loading: true,
+			skin: 'row',
+			even: true,
+			id: 'list',
+			page: true,
+			limits: [3, 5, 10],
+			limit: 3 //每页默认显示的数量
+		});
+		//checkbox多选只能为表单内单选
+		form.on('checkbox(distype)', function(data) {
+			$(data.elem).siblings("input").removeAttr("checked");
+			form.render('checkbox');
+		});
+		//触发data-type
+		$(document).on('click', '.layui-btn', function() {
+			var type = $(this).data('type');
+			active[type] ? active[type].call(this) : console.log("no active");
+		});
+		//表单选择事件
+		table.on('tool(edit)', function(obj) {
+			if(obj.event === 'set') {
+				active['changetype'] ? active['changetype'].call(this,obj) : layer.msg("changetype fail");
+			}
+		});
+	});
+</script>
+{/block}

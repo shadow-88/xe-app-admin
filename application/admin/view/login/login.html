@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>小二餐厅-后台登陆</title>
+		<link rel="stylesheet" href="__STATIC__/admin/css/layui.css">
+	</head>
+	<style type="text/css">
+		.icon-xe {
+			text-align: center;
+		}
+		
+		.icon-xe img {
+			width: 100%;
+			margin: 18vh 0 5vh 0;
+		}
+		
+		.layui-row {
+			margin-top: 2%;
+		}
+		
+		button {
+			margin: 3vh 0 0 0;
+		}
+	</style>
+
+	<body>
+		<div class="icon-xe layui-row">
+			<div class="layui-col-xs4 layui-col-sm1 layui-col-md1 layui-col-xs-offset4 layui-col-sm-offset5 layui-col-md-offset5">
+				<img src="__ROOT__/uploads/icon.png" />
+			</div>
+		</div>
+		<form class="layui-form" onsubmit="return false;">
+			<div class="layui-row">
+				<label class="layui-form-label layui-col-xs2 layui-col-sm2 layui-col-md2 layui-col-xs-offset1 layui-col-sm-offset4 layui-col-md-offset4">帐号</label>
+				<div class="layui-col-xs6 layui-col-sm2 layui-col-md2">
+					<input type="text" name="username" lay-verify="required" placeholder="请输入管理账号" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-row">
+				<label class="layui-form-label layui-col-xs2 layui-col-sm2 layui-col-md2 layui-col-xs-offset1 layui-col-sm-offset4 layui-col-md-offset4">密码</label>
+				<div class="layui-col-xs6 layui-col-sm2 layui-col-md2">
+					<input type="password" name="userpwd" lay-verify="required" placeholder="请输入管理密码" autocomplete="off" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-row">
+				<button class="layui-btn layui-col-xs4 layui-col-sm1 layui-col-md1 layui-col-xs-offset4 layui-col-sm-offset5 layui-col-md-offset5" lay-submit="" lay-filter="confirm">登陆</button>
+			</div>
+		</form>
+		<script src="__STATIC__/admin/layui.js"></script>
+		<script>
+			//跳转函数
+			function skip() {
+				window.location.replace("{:url('admin/index/index')}");
+			}
+			layui.use(['form'], function() {
+				var $ = layui.jquery;
+				var form = layui.form;
+				var layer = layui.layer
+				form.on('submit(confirm)', function(data) {
+					$.ajax({
+						url: "{:url('admin/login/test')}",
+						type: 'post',
+						data: {
+							acc: data.field.username + '&' + data.field.userpwd
+						},
+						dataType: 'json',
+						success: function(data) {
+							layer.msg('登陆成功');
+							setTimeout(skip, 1000);
+						},
+						error: function() {
+							layer.msg('请确认正确填写帐号密码!');
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>

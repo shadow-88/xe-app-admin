@@ -1,0 +1,744 @@
+{extend name='index/index'/} {block name='content'}
+<style type="text/css">
+	.layui-tab-content {
+		padding: 2vw;
+	}
+	
+	table {
+		width: 100% !important;
+	}
+	
+	form {
+		margin: 5vw;
+	}
+	fieldset{
+		position: relative;
+	}
+	.layui-table-cell {
+		height: inherit;
+		width: 92vw !important;
+		padding: 0;
+		margin: auto;
+	}
+	
+	.layui-row {
+		white-space: normal;
+		word-break: break-all;
+		line-height: 1rem;
+		font-size: 0.8rem;
+	}
+	
+	.layui-row .layui-row div {
+		padding: 0 2vw;
+	}
+	
+	.layui-table img {
+		width: 100%;
+		max-width: 100%;
+	}
+	
+	.layui-form-label {
+		padding: 9px 0;
+		width: 100%;
+	}
+	
+	.layui-input-block>.layui-col-xs12 {
+		border: 1px solid #e6e6e6;
+	}
+	
+	.layui-input-block>.layui-col-xs12>div {
+		padding: 1vw;
+		position: relative;
+	}
+	
+	.layui-input-block>.layui-col-xs12>div button {
+		width: 100%;
+	}
+	
+	.layui-input-block img {
+		width: 100%;
+	}
+	.my-del{
+		padding: 0;
+	    width: 22px;
+	    height: 22px;
+	    color: #000;
+	    background: #FFF;
+	    line-height: 11px;
+	    -moz-border-radius: 11px;
+	    -webkit-border-radius: 11px;
+	    border-radius: 11px;
+	    -moz-box-shadow: 1px 1px 1px #888888;
+	    box-shadow: 0px 0px 1px #888888;
+	    position: absolute;
+	    right: -11px;
+    	top: 2px;
+	}
+	.img-del{
+		padding: 0;
+	    width: 22px !important;
+	    height: 22px;
+	    color: #000;
+	    background: #FFF;
+	    line-height: 11px;
+	    -moz-border-radius: 11px;
+	    -webkit-border-radius: 11px;
+	    border-radius: 11px;
+	    -moz-box-shadow: 1px 1px 1px #888888;
+	    box-shadow: 0px 0px 1px #888888;
+	    position: absolute;
+	    right: -6px;
+    	top: -4px;
+	}
+	.my-del,.img-del .layui-icon{
+		margin: 0;
+	}
+	.my-del .layui-icon:hover,.img-del .layui-icon:hover{
+		color: red;
+	}
+	.layui-layer-btn{
+		text-align: center;
+	}
+</style>
+<script id="show" type="text/html">
+	<div class="layui-row">
+		<div class="layui-col-xs2 layui-col-sm2 layui-col-md1" style="padding-right: 1vw;">
+			<img src="__ROOT__/uploads/{{ JSON.parse(d.data).img }}">
+		</div>
+		<div class="layui-row layui-col-xs10 layui-col-sm10 layui-col-md11">
+			<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+				商家名:{{ JSON.parse(d.data).name }}
+			</div><div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+				跑马灯:{{ JSON.parse(d.data).lamp }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				商家标记:{{ JSON.parse(d.data).remark }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				商家权重:{{ d.allweight?d.allweight:"0" }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				起送价:{{ JSON.parse(d.data).min }}
+			</div>
+			<div class="layui-col-xs6 layui-col-sm6 layui-col-md2">
+				显示:{{ (d.type==1)?"显示":"隐藏" }}
+			</div>
+		</div>
+	</div>
+</script>
+<div class="layui-row">
+	<div class="layui-col-xs2 layui-col-sm2 layui-col-md1">
+		<label class="layui-form-label">关键词:</label>
+	</div>
+	<div class="layui-col-xs4 layui-col-sm2 layui-col-md2">
+		<input class="layui-input" autocomplete="off">
+	</div>
+	<div class="layui-col-xs2 layui-col-sm2 layui-col-md1">
+		<button class="layui-btn" data-type="reload">搜索</button>
+	</div>
+	<div class="layui-col-xs2 layui-col-sm2 layui-col-md1 layui-col-xs-offset2 layui-col-sm-offset2 layui-col-md-offset7">
+		<button class="layui-btn" data-type="new">新增</button>
+	</div>
+</div>
+<table id="list" lay-filter="edit"></table>
+<!--<form class="layui-form layui-form-pane" action="">
+	<input type="hidden" name="id">
+	<input type="hidden" name="img">
+	<input type="hidden" name="banner">
+	<div class="layui-form-item">
+		<label class="layui-form-label">商家名</label>
+		<div class="layui-input-block">
+			<input type="text" name="name" autocomplete="off" placeholder="请输入名称" lay-verify="required" class="layui-input">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">检索标记</label>
+		<div class="layui-input-block">
+			<input type="text" name="remark" autocomplete="off" placeholder="请输入检索标记" lay-verify="required" class="layui-input">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">图片上传</label>
+		<div class="layui-input-block">
+			<div class="layui-col-xs12">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					<button class="layui-btn" id="upimg" onclick="return false;">上传图片</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">图片上传</label>
+		<div class="layui-input-block">
+			<div class="layui-col-xs12">
+				<div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+					<button class="layui-btn" id="upbanner" onclick="return false;">上传banner</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">跑马灯</label>
+		<div class="layui-input-block">
+			<input type="text" name="lamp" autocomplete="off" placeholder="请输入跑马灯内容" class="layui-input">
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">起送价</label>
+		<div class="layui-input-block">
+			<input type="number" name="min" autocomplete="off" placeholder="请输入起送价" class="layui-input">
+		</div>
+	</div>
+	<div id="express">
+		<fieldset class="layui-elem-field">
+			<button class="layui-btn my-del" data-type="delkind" onclick="return false;">
+				<i class="layui-icon">&#x1006;</i>
+			</button>
+			<legend>运费阶梯</legend>
+			<div class="layui-form-item">
+				<label class="layui-form-label">初始值运费</label>
+				<div class="layui-input-block">
+					<input type="text" name="freight" autocomplete="off" placeholder="请输入数字" lay-verify="required" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">大于此价格</label>
+				<div class="layui-input-block">
+					<input type="number" name="more" autocomplete="off" placeholder="请输入数字" lay-verify="required" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">运费</label>
+				<div class="layui-input-block">
+					<input type="number" name="freight" autocomplete="off" placeholder="请输入数字" lay-verify="required" class="layui-input">
+				</div>
+			</div>
+		</fieldset>
+	</div>
+	<div id="kind">
+		<fieldset class="layui-elem-field">
+			<button class="layui-btn my-del" data-type="delkind" onclick="return false;">
+				<i class="layui-icon">&#x1006;</i>
+			</button>
+			<legend>产品分类</legend>
+			<div class="layui-field-box">
+				<div class="layui-form-item">
+					<label class="layui-form-label">分类名</label>
+					<div class="layui-input-block">
+						<input type="text" name="kind" autocomplete="off" placeholder="请输入分类名" lay-verify="required" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">产品</label>
+					<div class="layui-input-block">
+						<input type="checkbox" name="chan" value="0" title="隐藏">
+						<input type="checkbox" name="chan" value="1" title="一般">
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+	<div class="layui-form-item">
+		<button class="layui-btn layui-btn-small" lay-submit="" lay-filter="updata" onclick="return false;">提交</button>
+		<button class="layui-btn layui-btn-small" data-type="addexpress" onclick="return false;">添加运费阶梯</button>
+		<button class="layui-btn layui-btn-small" data-type="addkind" onclick="return false;">添加分类</button>
+		<button class="layui-btn layui-btn-small" data-type="cancel" onclick="return false;">取消</button>
+	</div>
+</form>-->
+<fieldset class="layui-elem-field layui-field-title">
+</fieldset>
+<script src="__STATIC__/underscore-min.js"></script>
+<script>
+	layui.use(['form', 'table', 'element', 'upload'], function() {
+		var form = layui.form,
+			table = layui.table,
+			$ = layui.$,
+			upload = layui.upload,
+			//所用到的表单和type范围预定义
+			model="seller",scope=1,
+			//预定义弹出层名字
+			lay_form,
+			//预定义产品数据
+			chandata,
+			active = {
+				//header
+				header: function() {
+					return '<form class="layui-form layui-form-pane"action=""><input type="hidden"name="id"><input type="hidden"name="img"><input type="hidden"name="banner"><div class="layui-form-item"><label class="layui-form-label">商家名</label><div class="layui-input-block"><input type="text"name="name"autocomplete="off"placeholder="请输入名称"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">检索标记</label><div class="layui-input-block"><input type="text"name="remark"autocomplete="off"placeholder="请输入检索标记"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">图片上传</label><div class="layui-input-block"><div class="layui-col-xs12"><div class="layui-col-xs12 layui-col-sm12 layui-col-md12"><button class="layui-btn"id="upimg"onclick="return false;">上传图片</button></div></div></div></div><div class="layui-form-item"><label class="layui-form-label">图片上传</label><div class="layui-input-block"><div class="layui-col-xs12"><div class="layui-col-xs12 layui-col-sm12 layui-col-md12"><button class="layui-btn"id="upbanner"onclick="return false;">上传banner</button></div></div></div></div><div class="layui-form-item"><label class="layui-form-label">跑马灯</label><div class="layui-input-block"><input type="text"name="lamp"autocomplete="off"placeholder="请输入跑马灯内容"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">起送价</label><div class="layui-input-block"><input type="number"name="min"autocomplete="off"placeholder="请输入起送价"class="layui-input"></div></div>';
+				},
+				content: function(){
+					return '<div id="express"><fieldset class="layui-elem-field"><legend>运费阶梯</legend><div class="layui-form-item"><label class="layui-form-label">初始值运费</label><div class="layui-input-block"><input type="text"name="freight"autocomplete="off"placeholder="请输入数字"lay-verify="required"class="layui-input"></div></div></fieldset></div><div id="kind">'+active['kind'].call(this)+'</div>';
+				},
+				express: function(){
+					return '<fieldset class="layui-elem-field"><button class="layui-btn my-del"data-type="delkind"onclick="return false;"><i class="layui-icon">&#x1006;</i></button><legend>运费阶梯</legend><div class="layui-form-item"><label class="layui-form-label">大于此价格</label><div class="layui-input-block"><input type="number"name="more"autocomplete="off"placeholder="请输入数字"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">运费</label><div class="layui-input-block"><input type="number"name="freight"autocomplete="off"placeholder="请输入数字"lay-verify="required"class="layui-input"></div></div></fieldset>';
+				},
+				kind: function(){
+					var dom;
+					dom='<fieldset class="layui-elem-field"><button class="layui-btn my-del"data-type="delkind"onclick="return false;"><i class="layui-icon">&#x1006;</i></button><legend>产品分类</legend><div class="layui-field-box"><div class="layui-form-item"><label class="layui-form-label">分类名</label><div class="layui-input-block"><input type="text"name="kind"autocomplete="off"placeholder="请输入分类名"lay-verify="required"class="layui-input"></div></div><div class="layui-form-item"><label class="layui-form-label">产品</label><div class="layui-input-block">';
+					layui.each(chandata, function(k, obj) {
+						dom+='<input type="checkbox" name="chan" value="'+obj.id+'" title="'+JSON.parse(obj.data).name+'">';
+					});
+					dom+='</div></div></div></fieldset>';
+					return dom;
+				},
+				footer: function(){
+					return '<div class="layui-form-item"><button class="layui-btn layui-btn-small"lay-submit=""lay-filter="updata"onclick="return false;">提交</button><button class="layui-btn layui-btn-small"data-type="addexpress"onclick="return false;">添加运费阶梯</button><button class="layui-btn layui-btn-small"data-type="addkind"onclick="return false;">添加分类</button><button class="layui-btn layui-btn-small"data-type="cancel"onclick="return false;">取消</button></div></form>';
+				},
+				getchan: function(){
+					$.ajax({
+						url: 'getchan',
+						type: 'post',
+						dataType: 'json',
+						data: {
+							type: scope+','+(scope+1)
+						},
+						success: function(data) {
+							if(data.code){
+								return layer.msg(data.msg);
+							}else{
+								//触发data-type
+								$(document).on('click', '.layui-btn', function() {
+									var type = $(this).data('type');
+									active[type] ? active[type].call(this) : console.log("no active");
+								});
+								//加载成功再赋值
+								chandata=data.data;
+							}
+						},
+						error: function() {
+							return layer.msg("产品读取失败，请重新加载页面！");
+						}
+					});
+				},
+				//新增
+				new: function() {
+					lay_form = layer.open({
+						type: 1,
+						title: false,
+						closeBtn: 0,
+						content: active['header'].call(this)+active['content'].call(this)+active['footer'].call(this),
+						scrollbar: false
+					});
+					layer.full(lay_form);
+					//监控upimg动作
+					active['upimg'].call(this);
+					//监控upbanner动作
+					active['upbanner'].call(this);
+					//上传触发
+					active['updata'].call(this);
+					//更新表单渲染
+					form.render();
+				},
+				//修改
+				edit: function(obj) {
+					lay_form = layer.open({
+						type: 1,
+						title: false,
+						closeBtn: 0,
+						content: active['header'].call(this)+active['content'].call(this)+active['footer'].call(this),
+						scrollbar: false
+					});
+					//表单数据显示
+					$("input[name='id']").val(obj.data.id);
+					$("input[name='name']").val(JSON.parse(obj.data.data).name);
+					$("input[name='remark']").val(JSON.parse(obj.data.data).remark);
+					$("input[name='img']").val(JSON.parse(obj.data.data).img);
+					$("input[name='banner']").val(JSON.parse(obj.data.data).banner);
+					$("input[name='lamp']").val(JSON.parse(obj.data.data).lamp);
+					$("input[name='min']").val(JSON.parse(obj.data.data).min);
+					//运费阶梯
+					layui.each(JSON.parse(obj.data.data).express, function(k, arr) {
+						if(k){
+							var content=$(active['express'].call(this));//active['content']需修改成kind或者express
+							content.find("input[name='more']").val(arr.more);
+							content.find("input[name='freight']").val(arr.freight);
+							$('#express').append(content);
+						}else{
+							$('#express').find("input[name='freight']").val(arr.freight);
+						}
+					});
+					//分类
+					layui.each(JSON.parse(obj.data.data).kind, function(k, arr) {
+						if(k){
+							var content=$(active['kind'].call(this));//active['content']需修改成kind或者express
+							//checkbox单独列出
+							layui.each(arr.chan.split(','), function(v, val) {
+								var check = content.find("input[value='"+val+"']");
+								check.attr("checked",true);
+							});
+							//其他内容
+							content.find("input[name='kind']").val(arr.kind);
+							$('#kind').append(content);
+						}else{
+							$('#kind').find("input[name='kind']").val(arr.kind);
+							layui.each(arr.chan.split(','), function(v, val) {
+								var check = $('#kind').find("input[value='"+val+"']");
+								check.attr("checked",true);
+							});
+						}
+					});
+					//视图更新
+					$('#upimg').parent().before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delimg" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+JSON.parse(obj.data.data).img+'"></div>');
+					$('#upbanner').parent().before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delbanner" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+JSON.parse(obj.data.data).banner+'"></div>');
+					//全屏
+					layer.full(lay_form);
+					//监控upimg动作
+					active['upimg'].call(this);
+					//监控upbanner动作
+					active['upbanner'].call(this);
+					//上传触发
+					active['updata'].call(this);
+					//更新表单渲染
+					form.render();
+				},
+				//搜索
+				reload: function() {
+					table.reload('list', {
+						where: {
+							key: $(this).parent().prev().children().val()
+						}
+					});
+				},
+				//改变权重
+				changeweight: function(obj,dom) {
+					//权重所在的位置可能不一样，尽量放在第二个位置
+					var thisdom=dom.eq(1);
+					layer.prompt({
+						formType: 0,
+						title: '修改 [ ' + JSON.parse(obj.data.data).name + ' ] 的权重'
+					}, function(value, index) {
+						value = parseInt(value) ? parseInt(value) : 0;
+						$.ajax({
+							url: "changeweight",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: model,
+								id: obj.data.id,
+								weight: value
+							},
+							success: function(data) {
+								thisdom.html('权重:'+value)
+								layer.msg("修改成功！");
+								return layer.close(index);
+							},
+							error: function() {
+								layer.msg("修改失败，请重试！");
+								return layer.close(index);
+							}
+						});
+	
+					});
+				},
+				//改变整站权重
+				changeallweight: function(obj,dom) {
+					//整站权重所在的位置可能不一样，尽量放在第三个位置
+					var thisdom=dom.eq(2);
+					layer.prompt({
+						formType: 0,
+						title: '修改 [ ' + JSON.parse(obj.data.data).name + ' ] 的整站权重'
+					}, function(value, index) {
+						value = parseInt(value) ? parseInt(value) : 0;
+						$.ajax({
+							url: "changeallweight",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: model,
+								id: obj.data.id,
+								weight: value
+							},
+							success: function(data) {
+								thisdom.html('整站权重:'+value)
+								layer.msg("修改成功！");
+								return layer.close(index);
+							},
+							error: function() {
+								layer.msg("修改失败，请重试！");
+								return layer.close(index);
+							}
+						});
+	
+					});
+				},
+				//改变显示方式
+				changetype: function(obj) {
+					//显示方式所在的位置可能不一样，尽量放在第三个位置*此处是第四个位置
+					var dom=$(this).find('.layui-col-xs10 div');
+					var typedom=dom.eq(3);
+					layer.msg('请选择 [ ' + JSON.parse(obj.data.data).name + ' ] 的处理方式！', {
+						time: 200000, //20s后自动关闭
+						btn: ['显示', '隐藏', '删除', '权重', '其他修改',  '取消'],
+						yes: function(index, layero) {
+							$.ajax({
+								url: "changetype",
+								type: 'post',
+								dataType: 'json',
+								data: {
+									table: model,
+									id: obj.data.id,
+									type: scope
+								},
+								success: function(data) {
+									typedom.html('显示:显示');
+									return layer.close(index);
+								},
+								error: function() {
+									return layer.msg("修改失败，请重试！");
+								}
+							});
+						},
+						btn2: function(index, layero) {
+							$.ajax({
+								url: "changetype",
+								type: 'post',
+								dataType: 'json',
+								data: {
+									table: model,
+									id: obj.data.id,
+									type: scope+1
+								},
+								success: function(data) {
+									typedom.html('显示:隐藏');
+								},
+								error: function() {
+									return layer.msg("修改失败，请重试！");
+								}
+							});
+						},
+						btn3: function(index, layero) {
+							layer.msg('是否删除？', {
+								time: 20000, //20s后自动关闭
+								btn: ['确认', '取消'],
+								yes: function(index, layero) {
+									$.ajax({
+										url: "changetype",
+										type: 'post',
+										dataType: 'json',
+										data: {
+											table: model,
+											id: obj.data.id,
+											type: scope+2
+										},
+										success: function(data) {
+											obj.del();
+											return layer.close(index);
+										},
+										error: function() {
+											return layer.msg("修改失败，请重试！");
+										}
+									});
+								}
+							});
+						},
+						btn4: function(index, layero) {
+							active['changeweight'] ? active['changeweight'].call(this,obj,dom) : layer.msg("changeweight fail");
+						},
+						btn5: function(index, layero) {
+							active['edit'] ? active['edit'].call(this,obj) : layer.msg("edit fail");
+						}
+					});
+				},
+				//上传
+				updata: function() {
+					form.on('submit(updata)', function(data) {
+						//id的值，data.field.id
+						//data的值
+						var out = new Object();
+						//name的值
+						out.name = data.field.name;
+						//remark的值
+						out.remark = data.field.remark;
+						//img的值
+						out.img = data.field.img;
+						//banner的值
+						out.banner = data.field.banner;
+						//lamp的值
+						out.lamp = data.field.lamp;
+						//min的值
+						out.min = data.field.min;
+						//kind的值
+						out.kind = active['getobj'] ? active['getobj'].call(this, '#kind') : null;
+						//express的值
+						out.express = active['getobj'] ? active['getobj'].call(this, '#express') : null;
+						//最终输出
+						if(out.img==""||out.banner==""){
+							layer.msg("请选择图片！");
+						}else{
+							$.ajax({
+								url: "updata",
+								type: 'post',
+								dataType: 'json',
+								data: {
+									table: model,
+									id: data.field.id,
+									data:JSON.stringify(out)
+								},
+								success: function(data) {
+									layer.close(lay_form);
+									//更新表单渲染
+									table.reload('list');
+									return layer.msg("提交成功！");
+								},
+								error: function() {
+									return layer.msg("提交失败，请重试！");
+								}
+							});
+						}
+					});
+				},
+				//获取表单信息，key为fieldset上一级的关键词
+				getobj: function(key) {
+					var res = new Array();
+					layui.each($(key).children("fieldset"), function(k, nodes) {
+						var arr = new Array(),middleware = new Array();
+						layui.each($(nodes).serializeArray(), function(v, data) {
+							arr[v] = _.chain(data)
+								.values()
+								.value();
+							middleware[v]=arr[v][0];
+						});
+						res[k] = {};
+						layui.each(_.union(middleware), function(v, name) {
+							layui.each(arr, function(i, children) {
+								if(children[0]==name){
+									if(res[k][name]==undefined){
+										res[k][name]=children[1];
+									}else{
+										res[k][name]+=','+children[1];
+									}
+								}
+							});
+						});
+					});
+					return res;
+				},
+				//图片上传img
+				upimg: function() {
+					upload.render({
+						elem: '#upimg',
+						url: 'upload',
+						before: function(obj) {
+							layer.load(2);
+						},
+						done: function(res, k, upload) {
+							layer.closeAll('loading');
+							//如果上传失败
+							if(res.code > 0) {
+								return layer.msg("上传失败！" + res.err);
+							} else {
+							//→→→→important→→→→→确认需赋值节点名称
+								var dom = $("input[name='img']");
+							//隐藏input的更新img
+								dom.val(res.url);
+							//视图更新
+								var parent=this.item.parent();
+								//单图片，所以需要在更新视图前删除前一个节点
+								if(parent.prev().length){
+									parent.prev().remove();
+								}
+								parent.before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delimg" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+res.url+'"></div>');
+							//弹出层提示
+								return layer.msg(res.msg);
+							}
+						}
+					});
+				},
+				//图片上传banner
+				upbanner: function() {
+					upload.render({
+						elem: '#upbanner',
+						url: 'upload',
+						before: function(obj) {
+							layer.load(2);
+						},
+						done: function(res, k, upload) {
+							layer.closeAll('loading');
+							//如果上传失败
+							if(res.code > 0) {
+								return layer.msg("上传失败！" + res.err);
+							} else {
+							//→→→→important→→→→→确认需赋值节点名称
+								var dom = $("input[name='banner']");
+							//隐藏input的更新banner（单图片）
+								dom.val(res.url);
+							//视图更新
+								var parent=this.item.parent();
+								//单图片，所以需要在更新视图前删除前一个节点
+								if(parent.prev().length){
+									parent.prev().remove();
+								}
+								parent.before('<div class="layui-col-xs4 layui-col-sm4 layui-col-md2"><button class="layui-btn img-del" data-type="delbanner" onclick="return false;"><i class="layui-icon">&#x1006;</i></button><img src="/xe-app-admin/public/uploads/'+res.url+'"></div>');
+							//弹出层提示
+								return layer.msg(res.msg);
+							}
+						}
+					});
+				},
+				addkind: function() {
+					$('#kind').append(active['kind'].call(this));
+					//更新表单渲染
+					form.render();
+				},
+				addexpress: function() {
+					$('#express').append(active['express'].call(this));
+					//更新表单渲染
+					form.render();
+				},
+				delkind: function() {
+					if($(this).parent().siblings('fieldset').length){
+						$(this).parent().remove();
+					}
+				},
+				delimg: function() {
+					//input隐藏域更新
+					var dom = $("input[name='img']");
+					dom.val("");
+					//视图更新
+					$(this).parent().remove();
+					return layer.msg("图片已删除");
+				},
+				delbanner: function() {
+					//input隐藏域更新
+					var dom = $("input[name='banner']");
+					dom.val("");
+					//视图更新
+					$(this).parent().remove();
+					return layer.msg("图片已删除");
+				},
+				//取消
+				cancel: function(){
+					layer.close(lay_form);
+				}
+			};
+		//为产品数据赋值，并且赋值成功才能激活点击事件
+		active['getchan'].call(this);
+		//表格
+		table.render({
+			elem: '#list',
+			url: model+'list?type='+scope+','+(scope+1),
+			height: 'auto',
+			cols: [
+				[{
+					title: '数据列表，需要修改请直接点击对应行',
+					templet: '#show',
+					event: 'set',
+					style: 'cursor: pointer;'
+				}]
+			],
+			loading: true,
+			skin: 'row',
+			even: true,
+			id: 'list',
+			page: true,
+			limits: [3, 5, 10],
+			limit: 3 //每页默认显示的数量
+		});
+		//表单选择事件
+		table.on('tool(edit)', function(obj) {
+			if(obj.event === 'set') {
+				active['changetype'] ? active['changetype'].call(this,obj) : layer.msg("changetype fail");
+			}
+		});
+	});
+</script>
+{/block}

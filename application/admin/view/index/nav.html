@@ -1,0 +1,14 @@
+{$url=$Think.server.path_info}
+{$url=ltrim($url,'/admin/index/')}
+{$url=rtrim($url,'.html')}
+{foreach $data=json_decode($Think.session.admin.acc['func']) as $vo} 
+    <a href="{:url('admin/index/'.$vo->url)}">
+		{if condition="$vo->url eq $url"}
+			<li class="layui-this">
+		{else /}
+			<li>
+		{/if}
+			{$vo->name}
+		</li>
+	</a>
+{/foreach}

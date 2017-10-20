@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>小二餐厅-后台系统</title>
+		<link rel="stylesheet" href="__STATIC__/admin/css/layui.css">
+		<script src="__STATIC__/admin/layui.js"></script>
+	</head>
+	<body>
+		<!--导航模版-->
+		<div class="layui-tab layui-tab-brief">
+			<ul class="layui-tab-title">
+				{block name='nav'}{/block}
+			</ul>
+		</div>
+		<!--内容模版-->
+		<div class="layui-tab-content">
+			{block name='content'}{/block}
+		</div>
+		<div class="layui-layout-admin">
+			<div class="layui-footer" style="left: 0;text-align: center;">
+				© 睿捷网络
+			</div>
+		</div>
+	</body>
+</html>

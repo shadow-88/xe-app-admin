@@ -1,0 +1,612 @@
+{extend name='index/index'/} {block name='content'}
+<style type="text/css">
+	.laytable-cell-1-img,
+	.laytable-cell-2-img,
+	.laytable-cell-3-img {
+		height: inherit;
+	}
+</style>
+<script id="type" type="text/html">
+	{{# if(d.type==1){ }} 显示 {{# }else{ }} 隐藏 {{# } }}
+</script>
+<script id="img" type="text/html">
+	<img src="__ROOT__/uploads/{{ d.img }}">
+</script>
+<fieldset class="layui-elem-field layui-field-title">
+	<legend>banner管理</legend>
+</fieldset>
+<div class="layui-upload">
+	<button type="button" class="layui-btn" id="banner">上传图片</button>
+</div>
+<table id="bannerlist" lay-filter="banneredit"></table>
+<fieldset class="layui-elem-field layui-field-title">
+	<legend>图标管理</legend>
+</fieldset>
+<div class="layui-upload">
+	<button type="button" class="layui-btn" id="icons">上传图标</button>
+</div>
+<table id="iconslist" lay-filter="iconsedit"></table>
+<fieldset class="layui-elem-field layui-field-title">
+	<legend>自定义图片管理</legend>
+</fieldset>
+<div class="layui-upload">
+	<button type="button" class="layui-btn" id="custom">上传图片</button>
+</div>
+<table id="customlist" lay-filter="customedit"></table>
+<fieldset class="layui-elem-field layui-field-title">
+</fieldset>
+<script>
+	layui.use(['table', 'element', 'upload'], function() {
+		var table = layui.table,
+			$ = layui.jquery,
+			upload = layui.upload;
+	//banner功能
+		//表格
+		var bannertable = table.render({
+			elem: '#bannerlist',
+			url: 'homelist?type=1,2',
+			height: 300,
+			cols: [
+				[{
+					field: 'img',
+					title: '图片预览',
+					width: 130,
+					templet: '#img'
+				}, {
+					field: 'weight',
+					title: '权重',
+					width: 60,
+					event: 'setWeight',
+					style: 'cursor: pointer;'
+				}, {
+					field: 'type',
+					title: '显示',
+					width: 60,
+					event: 'setType',
+					style: 'cursor: pointer;',
+					//templet: '#type'
+				}, {
+					field: 'data',
+					title: '链接',
+					width: 200,
+					edit: 'text'
+				}]
+			],
+			loading: true,
+			skin: 'row',
+			even: true,
+			page: true,
+			limits: [3, 5, 10],
+			limit: 3 //每页默认显示的数量
+		});
+		//表单选择事件
+		table.on('tool(banneredit)', function(obj) {
+			var data = obj.data;
+			if(obj.event === 'setWeight') {
+				layer.prompt({
+					formType: 0,
+					title: '修改 ID 为 [' + data.id + '] 的banner权重'
+				}, function(value, index) {
+					value = parseInt(value) ? parseInt(value) : 0;
+					$.ajax({
+						url: "changeweight",
+						type: 'post',
+						dataType: 'json',
+						data: {
+							table: 'home',
+							id: obj.data.id,
+							weight: value
+						},
+						success: function(data) {
+							obj.update({
+								weight: value
+							});
+							return layer.close(index);
+						},
+						error: function() {
+							layer.msg("修改失败，请重试！");
+							return layer.close(index);
+						}
+					});
+
+				});
+			} else if(obj.event === 'setType') {
+				layer.msg('请选择显示方式！', {
+					time: 20000, //20s后自动关闭
+					btn: ['显示', '隐藏', '删除', '取消'],
+					yes: function(index, layero) {
+						$.ajax({
+							url: "changetype",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: 'home',
+								id: obj.data.id,
+								type: 1
+							},
+							success: function(data) {
+								obj.update({
+									type: '显示'
+								});
+								return layer.close(index);
+							},
+							error: function() {
+								return layer.msg("修改失败，请重试！");
+							}
+						});
+					},
+					btn2: function(index, layero) {
+						$.ajax({
+							url: "changetype",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: 'home',
+								id: obj.data.id,
+								type: 2
+							},
+							success: function(data) {
+								obj.update({
+									type: '隐藏'
+								});
+							},
+							error: function() {
+								return layer.msg("修改失败，请重试！");
+							}
+						});
+					},
+					btn3: function(index, layero) {
+						layer.msg('是否删除？', {
+							time: 20000, //20s后自动关闭
+							btn: ['确认', '取消'],
+							yes: function(index, layero) {
+								$.ajax({
+									url: "changetype",
+									type: 'post',
+									dataType: 'json',
+									data: {
+										table: 'home',
+										id: obj.data.id,
+										type: 3
+									},
+									success: function(data) {
+										obj.del();
+										return layer.close(index);
+									},
+									error: function() {
+										return layer.msg("修改失败，请重试！");
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		//表单编辑
+		table.on('edit(banneredit)', function(obj) {
+			$.ajax({
+				url: "changedata",
+				type: 'post',
+				dataType: 'json',
+				data: {
+					table: 'home',
+					id: obj.data.id,
+					data: obj.value
+				},
+				success: function(data) {
+					return layer.msg("修改成功！");
+				},
+				error: function() {
+					return layer.msg("修改失败，请重试！");
+				}
+			});
+		});
+		//banner上传
+		upload.render({
+			elem: '#banner',
+			url: 'upload',
+			data: {
+				table: 'home',
+				type: 2
+			},
+			done: function(res) {
+				//如果上传失败
+				if(res.code > 0) {
+					return layer.msg("上传失败！" + res.err);
+				} else {
+					//bannertable重置
+					bannertable.reload();
+					return layer.msg(res.msg);
+				}
+			}
+		});
+	//icon功能
+		//表格
+		var iconstable = table.render({
+			elem: '#iconslist',
+			url: 'homelist?type=4,5',
+			height: 300,
+			cols: [
+				[{
+					field: 'img',
+					title: '图片预览',
+					width: 130,
+					templet: '#img'
+				}, {
+					field: 'name',
+					title: '功能',
+					width: 60,
+					edit: 'text'
+				}, {
+					field: 'weight',
+					title: '权重',
+					width: 60,
+					event: 'setWeight',
+					style: 'cursor: pointer;'
+				}, {
+					field: 'type',
+					title: '显示',
+					width: 60,
+					event: 'setType',
+					style: 'cursor: pointer;',
+					//templet: '#type'
+				}, {
+					field: 'data',
+					title: '链接',
+					width: 200,
+					edit: 'text'
+				}]
+			],
+			loading: true,
+			skin: 'row',
+			even: true,
+			page: true,
+			limits: [3, 5, 10],
+			limit: 3 //每页默认显示的数量
+		});
+		//表单选择事件
+		table.on('tool(iconsedit)', function(obj) {
+			var data = obj.data;
+			if(obj.event === 'setWeight') {
+				layer.prompt({
+					formType: 0,
+					title: '修改 ID 为 [' + data.id + '] 的icons权重'
+				}, function(value, index) {
+					value = parseInt(value) ? parseInt(value) : 0;
+					$.ajax({
+						url: "changeweight",
+						type: 'post',
+						dataType: 'json',
+						data: {
+							table: 'home',
+							id: obj.data.id,
+							weight: value
+						},
+						success: function(data) {
+							obj.update({
+								weight: value
+							});
+							return layer.close(index);
+						},
+						error: function() {
+							layer.msg("修改失败，请重试！");
+							return layer.close(index);
+						}
+					});
+
+				});
+			} else if(obj.event === 'setType') {
+				layer.msg('请选择显示方式！', {
+					time: 20000, //20s后自动关闭
+					btn: ['显示', '隐藏', '删除', '取消'],
+					yes: function(index, layero) {
+						$.ajax({
+							url: "changetype",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: 'home',
+								id: obj.data.id,
+								type: 4
+							},
+							success: function(data) {
+								obj.update({
+									type: '显示'
+								});
+								return layer.close(index);
+							},
+							error: function() {
+								return layer.msg("修改失败，请重试！");
+							}
+						});
+					},
+					btn2: function(index, layero) {
+						$.ajax({
+							url: "changetype",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: 'home',
+								id: obj.data.id,
+								type: 5
+							},
+							success: function(data) {
+								obj.update({
+									type: '隐藏'
+								});
+							},
+							error: function() {
+								return layer.msg("修改失败，请重试！");
+							}
+						});
+					},
+					btn3: function(index, layero) {
+						layer.msg('是否删除？', {
+							time: 20000, //20s后自动关闭
+							btn: ['确认', '取消'],
+							yes: function(index, layero) {
+								$.ajax({
+									url: "changetype",
+									type: 'post',
+									dataType: 'json',
+									data: {
+										table: 'home',
+										id: obj.data.id,
+										type: 6
+									},
+									success: function(data) {
+										obj.del();
+										return layer.close(index);
+									},
+									error: function() {
+										return layer.msg("修改失败，请重试！");
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		//表单编辑
+		table.on('edit(iconsedit)', function(obj) {
+			if(obj.field == "data") {
+				$.ajax({
+					url: "changedata",
+					type: 'post',
+					dataType: 'json',
+					data: {
+						table: 'home',
+						id: obj.data.id,
+						data: obj.value
+					},
+					success: function(data) {
+						return layer.msg("修改成功！");
+					},
+					error: function() {
+						return layer.msg("修改失败，请重试！");
+					}
+				});
+			} else if(obj.field == "name") {
+				$.ajax({
+					url: "changename",
+					type: 'post',
+					dataType: 'json',
+					data: {
+						table: 'home',
+						id: obj.data.id,
+						name: obj.value
+					},
+					success: function(data) {
+						return layer.msg("修改成功！");
+					},
+					error: function() {
+						return layer.msg("修改失败，请重试！");
+					}
+				});
+			}
+		});
+		//icons上传
+		upload.render({
+			elem: '#icons',
+			url: 'upload',
+			data: {
+				table: 'home',
+				type: 5
+			},
+			done: function(res) {
+				//如果上传失败
+				if(res.code > 0) {
+					return layer.msg("上传失败！" + res.err);
+				} else {
+					//iconstable重置
+					iconstable.reload();
+					return layer.msg(res.msg);
+				}
+			}
+		});
+	//自定义图片管理
+		//表格
+		var customtable = table.render({
+			elem: '#customlist',
+			url: 'homelist?type=7,8',
+			height: 300,
+			cols: [
+				[{
+					field: 'img',
+					title: '图片预览',
+					width: 130,
+					templet: '#img'
+				}, {
+					field: 'weight',
+					title: '权重',
+					width: 60,
+					event: 'setWeight',
+					style: 'cursor: pointer;'
+				}, {
+					field: 'type',
+					title: '显示',
+					width: 60,
+					event: 'setType',
+					style: 'cursor: pointer;',
+					//templet: '#type'
+				}, {
+					field: 'data',
+					title: '链接',
+					width: 200,
+					edit: 'text'
+				}]
+			],
+			loading: true,
+			skin: 'row',
+			even: true,
+			page: true,
+			limits: [3, 5, 10],
+			limit: 3 //每页默认显示的数量
+		});
+		//表单选择事件
+		table.on('tool(customedit)', function(obj) {
+			var data = obj.data;
+			if(obj.event === 'setWeight') {
+				layer.prompt({
+					formType: 0,
+					title: '修改 ID 为 [' + data.id + '] 的custom权重'
+				}, function(value, index) {
+					value = parseInt(value) ? parseInt(value) : 0;
+					$.ajax({
+						url: "changeweight",
+						type: 'post',
+						dataType: 'json',
+						data: {
+							table: 'home',
+							id: obj.data.id,
+							weight: value
+						},
+						success: function(data) {
+							obj.update({
+								weight: value
+							});
+							return layer.close(index);
+						},
+						error: function() {
+							layer.msg("修改失败，请重试！");
+							return layer.close(index);
+						}
+					});
+
+				});
+			} else if(obj.event === 'setType') {
+				layer.msg('请选择显示方式！', {
+					time: 20000, //20s后自动关闭
+					btn: ['显示', '隐藏', '删除', '取消'],
+					yes: function(index, layero) {
+						$.ajax({
+							url: "changetype",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: 'home',
+								id: obj.data.id,
+								type: 7
+							},
+							success: function(data) {
+								obj.update({
+									type: '显示'
+								});
+								return layer.close(index);
+							},
+							error: function() {
+								return layer.msg("修改失败，请重试！");
+							}
+						});
+					},
+					btn2: function(index, layero) {
+						$.ajax({
+							url: "changetype",
+							type: 'post',
+							dataType: 'json',
+							data: {
+								table: 'home',
+								id: obj.data.id,
+								type: 8
+							},
+							success: function(data) {
+								obj.update({
+									type: '隐藏'
+								});
+							},
+							error: function() {
+								return layer.msg("修改失败，请重试！");
+							}
+						});
+					},
+					btn3: function(index, layero) {
+						layer.msg('是否删除？', {
+							time: 20000, //20s后自动关闭
+							btn: ['确认', '取消'],
+							yes: function(index, layero) {
+								$.ajax({
+									url: "changetype",
+									type: 'post',
+									dataType: 'json',
+									data: {
+										table: 'home',
+										id: obj.data.id,
+										type: 9
+									},
+									success: function(data) {
+										obj.del();
+										return layer.close(index);
+									},
+									error: function() {
+										return layer.msg("修改失败，请重试！");
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		//表单编辑
+		table.on('edit(customedit)', function(obj) {
+			$.ajax({
+				url: "changedata",
+				type: 'post',
+				dataType: 'json',
+				data: {
+					table: 'home',
+					id: obj.data.id,
+					data: obj.value
+				},
+				success: function(data) {
+					return layer.msg("修改成功！");
+				},
+				error: function() {
+					return layer.msg("修改失败，请重试！");
+				}
+			});
+		});
+		//自定义图片上传
+		upload.render({
+			elem: '#custom',
+			url: 'upload',
+			data: {
+				table: 'home',
+				type: 8
+			},
+			done: function(res) {
+				//如果上传失败
+				if(res.code > 0) {
+					return layer.msg("上传失败！" + res.err);
+				} else {
+					//iconstable重置
+					customtable.reload();
+					return layer.msg(res.msg);
+				}
+			}
+		});
+	});
+</script>
+{/block}
